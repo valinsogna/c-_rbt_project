@@ -1,3 +1,18 @@
+# Red-Black Tree in c++
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
 Implementation of Red-Black Tree class and its iterator in c++
 
 ## Introduction
@@ -12,10 +27,10 @@ Thanks to the mentioned properties, it is possible to insert, delete, and
 search a value in a red-black tree in time O(log n) (e.g., see [1]).
 
 ## Implementation
-```cpp
+
 Implement the generic classes:
-- RBTree<T, CMP=std::less<T>> 
-- RBTree<T, CMP=std::less<T>>::const iterator to represent red-black trees and their constant iterators.
+- ```cpp RBTree<T, CMP=std::less<T>> 
+- ```cpp RBTree<T, CMP=std::less<T>>::const iterator to represent red-black trees and their constant iterators.
 
 const iterator must provide the following public methods:
 - const T& operator*() const to get the value associated to the iterator;
@@ -33,3 +48,25 @@ Moreover, RBTree must provide the following public methods:
 - RBTree<T, CMP>::const_iterator end() const to get the last value for a tree iterator. 
 
 Few functions showing the classes features are also requested (e.g., by using the Boost test library).
+
+<!-- MARKDOWN LINKS & IMAGES -->
+
+[contributors-shield]: https://img.shields.io/github/contributors/valinsogna/c-_rbt_project.svg?style=for-the-badge
+
+[contributors-url]: https://github.com/valinsogna/c-_rbt_project/graphs/contributors
+
+[forks-shield]: https://img.shields.io/github/forks/valinsogna/c-_rbt_project.svg?style=for-the-badge
+
+[forks-url]: https://github.com/valinsogna/c-_rbt_project/network/members
+
+[stars-shield]: https://img.shields.io/github/stars/valinsogna/c-_rbt_project.svg?style=for-the-badge
+
+[stars-url]: https://github.com/valinsogna/c-_rbt_project/stargazers
+
+[issues-shield]: https://img.shields.io/github/issues/valinsogna/c-_rbt_project.svg?style=for-the-badge
+
+[issues-url]: https://github.com/valinsogna/c-_rbt_project/issues
+
+[license-shield]: https://img.shields.io/github/license/valinsogna/c-_rbt_project.svg?style=for-the-badge
+
+[license-url]: https://github.com/valinsogna/c-_rbt_project/blob/main/LICENSE
