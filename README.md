@@ -49,6 +49,9 @@ Moreover, RBTree must provide the following public methods:
 
 Few functions showing the classes features are also requested (e.g., by using the Boost test library).
 
+## References
+[1]: Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. Introduction to Algorithms. The MIT Press, 2nd edition, 2001
+
 <!-- MARKDOWN LINKS & IMAGES -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/valinsogna/c-_rbt_project.svg?style=for-the-badge
