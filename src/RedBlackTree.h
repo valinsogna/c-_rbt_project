@@ -33,8 +33,8 @@ class Node {
     // setters
     void setKey(T key) { this->key = key; }
     void setColor(color color) { if(this=nullptr) : this->color = color; } // NIL nodes are black
-    // void setLeft(std::unique_ptr< Node<T> > left) { this->left = std::make_unique<Node>(std::move(left)); }
-    // void setRight(std::unique_ptr< Node<T> > right) { this->right = right; }
+    void setLeft(std::unique_ptr< Node<T> > left) { this->left.reset(left) ; }
+    void setRight(std::unique_ptr< Node<T> > right) { this->right.reset(right); }
     void setParent( Node<T> *parent) { this->parent = parent; }
 
     // useful functions
@@ -52,7 +52,7 @@ class Node {
     Node<T>* get_uncle() const { return this->parent->get_sibling(); }
     Node<T>* get_grandparent() const { return parent->parent; }
 
-    void setChild(const side s, Node<T>* child) { 
+    void setChild(const side s, Node<T>* child) { // TO EDIT
         if (s == side::left) left = child; else right = child; 
         if (child) child->parent = this; 
     }
