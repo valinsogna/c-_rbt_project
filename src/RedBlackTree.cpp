@@ -5,7 +5,7 @@
 #include <iostream>
 
 template <typename T>
-void inorder_walk_aux(const std::unique_ptr< Node<T> > node) {
+void inorder_walk_aux(const std::unique_ptr< typename RBTree<T>::Node > node) {
     if (node == nullptr) return;
     inorder_walk_aux(node->getLeft());
     std::cout << node->getKey() << " ";
