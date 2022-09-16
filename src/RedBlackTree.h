@@ -1,7 +1,8 @@
 #ifndef __RedBlackTree_H__
 #define __RedBlackTree_H__
 
-#include <memory> // for unique_ptr
+#include <memory> // for std::unique_ptr
+#include <functional> // for std::less
 
 enum class color : bool {black, red};
 enum class side : bool {left, right};
@@ -17,9 +18,10 @@ class Node {
 
     public:
     // default ctor
-    Node(): color{color::black},left{nullptr}, right{nullptr}, parent{nullptr}{}
-    // custom ctor
-    explicit Node(T key) : key{key}, color{color::black}, left{nullptr}, right{nullptr}, parent{nullptr} {}
+    Node(): color{color::black}, parent{nullptr}{}
+    // custom ctors
+    explicit Node(T& key) : key{key}, color{color::black}, parent{nullptr} {}
+    explicit Node(T&& key) : key{std::move(key)}, color{color::black}, parent{nullptr} {}
     // default dtor
     ~Node() = default;
 
@@ -33,8 +35,8 @@ class Node {
     // setters
     void setKey(T key) { this->key = key; }
     void setColor(color color) { if(this=nullptr) : this->color = color; } // NIL nodes are black
-    void setLeft(std::unique_ptr< Node<T> > left) { this->left.reset(left) ; }
-    void setRight(std::unique_ptr< Node<T> > right) { this->right.reset(right); }
+    void setLeft(std::unique_ptr< Node<T> > left) { this->left.reset(left) ; } // TO EDIT?
+    void setRight(std::unique_ptr< Node<T> > right) { this->right.reset(right); } // TO EDIT?
     void setParent( Node<T> *parent) { this->parent = parent; }
 
     // useful functions
@@ -48,24 +50,27 @@ class Node {
     // reverse the side:
     side get_opposite_side() const { return !this.get_side(); }
     // gets the child on side s:
-    Node<T>* get_child(const side s) const { return s == side::left ? left : right; }
+    Node<T>* get_child(side s) const { return s == side::left ? left : right; }
     Node<T>* get_uncle() const { return this->parent->get_sibling(); }
     Node<T>* get_grandparent() const { return parent->parent; }
 
-    void setChild(const side s, Node<T>* child) { // TO EDIT
+    // Used for BST insertion:
+    void setChild(side s, std::unique_ptr< Node<T> > child) { // TO EDIT?
         if (s == side::left) left = child; else right = child; 
         if (child) child->parent = this; 
     }
 };
 
 // Class to represent Red-Black Tree
-template <typename T>
+template <typename T, typename CMP=std::less<T>>
 class RBTree{
-    std::unique_ptr< Node<T> > root;
+    std::unique_ptr< Node<T>, > root;
 
     public:
     // default ctor
-    RBTree() { root = nullptr; }
+    RBTree(){}
+    // default dtor
+    ~RBTree() = default;
 };
 
 template <typename T>
