@@ -53,16 +53,7 @@ class Node {
     Node<T>* get_child(side s) const { return s == side::left ? left : right; }
     Node<T>* get_uncle() const { return this->parent->get_sibling(); }
     Node<T>* get_grandparent() const { return parent->parent; }
-
-        Node* get_sibling() const { return is_right_child() ? parent->left : parent->right; }
-        // gets the side of the node relative to its parent:
-        side get_side() const { return is_right_child() ? side::right : side::left; }
-        // reverse the side:
-        side get_opposite_side() const { return !this.get_side(); }
-        // gets the child on side s:
-        Node* get_child(side s) const { return s == side::left ? left : right; }
-        Node* get_uncle() const { return this->parent->get_sibling(); }
-        Node* get_grandparent() const { return parent->parent; }
+};
 
 // Class to represent Red-Black Tree
 template <typename T, typename CMP=std::less<T>>
