@@ -77,7 +77,19 @@ void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
     }
     // Restore RB properties:
     node.setColour(Color::red);
-    insert_fixup(node);
+    insert_fixup(std::move(node));
+}
+
+template <typename T, typename CMP>
+void RBTree<T,CMP>::rotate(std::unique_ptr<Node<T>>&& x, side s){
+    side r_s = get_reverse_side(s);
+    auto y = std::move(x->get_child(r_s));
+    auto removed_x = transplant( x.get(), std::move(y));
+    auto beta = std::move(y->get_child(s));
+    auto removed_y = transplant( beta.get(), std::move(y));
+    x->setChild(r_s, std::move(beta));
+    delete removed_x;
+    delete removed_y;
 }
 
 template <typename T, typename CMP>

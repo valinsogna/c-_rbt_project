@@ -8,6 +8,7 @@
 
 enum class Color : bool {black, red};
 enum class side : bool {left, right};
+side get_reverse_side(const side s) { return s == side::right? side::left : side::right; }
 
 struct Multi_insert {
     std::string message;
@@ -78,23 +79,9 @@ class RBTree {
     void insert(std::unique_ptr<Node<T>>);
     // Replace x by y in the tree. It returns the ptr to the removed x:
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
-
-    void rotate(std::unique_ptr<Node<T>>&& x, side s){
-        side r_s = x->get_opposite_side();
-
-        auto y = std::move(x->get_child(r_s));
-        auto removed_x = transplant( x.get(), std::move(y));
-
-        auto beta = std::move(y->get_child(s));
-        auto removed_y = transplant( beta.get(), std::move(y));
-
-        x->setChild(r_s, std::move(beta));
-
-        delete removed_x;
-        delete removed_y;
-    }
-
+    void rotate(std::unique_ptr<Node<T>>&& x, side s);
     bool delete(Node<T>*); 
+    void insert_fixup(std::unique_ptr<Node<T>>&& node);
 
     public:
     // ctor
