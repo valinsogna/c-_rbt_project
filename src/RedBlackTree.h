@@ -3,9 +3,17 @@
 
 #include <memory> // for std::unique_ptr
 #include <functional> // for std::less
+#include <string>
+#include <iostream>
 
 enum class Color : bool {black, red};
 enum class side : bool {left, right};
+
+struct Multi_insert {
+    std::string message;
+    Multi_insert(std::string s) : message{std::move(s)} {}
+    const char* what() const { return message.c_str(); }
+};
 
 // Class to represent Red-Black Tree Node
 template <typename T>
@@ -18,12 +26,12 @@ class Node {
 
     public:
     // default ctor
-    Node(): color{Color::black}, parent{nullptr}{}
+    Node() noexcept : color{Color::black}, parent{nullptr}{}
     // custom ctors
-    explicit Node(const T& key) : key{key}, color{Color::black}, parent{nullptr} {}
-    explicit Node(T&& key) : key{std::move(key)}, color{Color::black}, parent{nullptr} {}
+    explicit Node(const T& key) noexcept : key{key}, color{Color::black}, parent{nullptr} {}
+    explicit Node(T&& key) noexcept : key{std::move(key)}, color{Color::black}, parent{nullptr} {}
     // default dtor
-    ~Node() = default;
+    ~Node() noexcept = default;
 
     // getters
     T getKey() const { return key; }
@@ -63,34 +71,43 @@ class RBTree {
 
     // useful private methods 
     const Node<T>* search_subtree(Node<T>*, const T&) const;
-    void insert(std::unique_ptr<Node<T>>); //to insert a new value in the tree;
-    bool contains(const T& ) const; //to test whether the tree contains a value;
-    bool delete(Node<T>* ); //to delete a value from the tree;
+    void insert(std::unique_ptr<Node<T>>);
+    bool delete(Node<T>*); 
 
     public:
     // ctor
-    RBTree() : cmp{std::less<T>()}{}
+    RBTree() noexcept : cmp{std::less<T>()}{}
     // default dtor
-    ~RBTree() = default;
+    ~RBTree() noexcept = default;
 
-    // some functions
+    // PUBLIC METHODS
     Node<T>* minimum_in_subtree(Node<T>*) const;
     Node<T>* maximum_in_subtree(Node<T>*) const;
     Node<T>* successor(const Node<T>*) const;
 
-    // useful public methods
-    Node<T>* search_subtree(const T& key) const{
-        return search_subtree(root.get(), key);
-    }
+    // To search a value from the tree:
+    Node<T>* search_subtree(const T& key) const{ return search_subtree(root.get(), key);};
 
+    // To insert a new value in the tree:
     void insert(const T& key) {
         auto z = std::make_unique<Node<T>>(key);
-        insert(std::move(z));
+        try {
+            insert(std::move(z));
+        } catch (const Multi_insert& e) {
+            std::cerr << e.what() << std::endl;
+        } catch (...) {
+            std::cerr << "Unknown exception. Aborting.\n";
+            //std::abort();
+        }
     }
 
-    void delete(const T& key) {
+    // To test whether the tree contains a value:
+    bool contains(const T& key) const{ return search_subtree(key) != nullptr;}; 
+
+    // To delete a value from the tree:      
+    bool delete(const T& key) {
         auto z = search_subtree(key);
-        delete(z);
+        return delete(z);
     }
 };
 

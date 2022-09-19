@@ -2,7 +2,6 @@
 // Author: Valeria Insogna
 
 #include "RedBlackTree.h"
-#include <iostream>
 
 // Methods for RBTree class
 template <typename T, typename CMP>
@@ -50,6 +49,57 @@ const Node<T>* RBTree<T,CMP>::search_subtree(Node<T>* node, const T& key) const{
         return search(node->getRight().get(), key); //Check if .get() is needed
 }
 
+template <typename T, typename CMP>
+void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
+    auto x = root.get();
+    auto y = root.get();
+    while (x != nullptr) {
+        y = x;
+        if (cmp(node->getKey(), x->getKey())) {
+            x = x->getLeft();
+            if (cmp(x->getKey(), node->getKey())){
+                throw Multi_insert{
+                    "Cannot handle multiple insertions. You gave me " +
+                    std::to_string(x->getKey())
+                };
+            }
+        } else {
+            x = x->getRight();
+        }
+    }
+    node->setParent(y);
+    if (y == nullptr) {
+        root.reset(node);
+    } else if (cmp(node->getKey(), y->getKey())) {
+        y->setLeft(std::move(node));
+    } else {
+        y->setRight(std::move(node));
+    }
+    insert_fixup(node);
+}
+
+// template <typename T, typename CMP>
+// void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
+//     auto y = root.get();
+//     auto x = root.get();
+//     while (x != nullptr) {
+//         y = x;
+//         if (cmp(node->getKey(), x->getKey())) {
+//             x = x->getLeft();
+//         } else {
+//             x = x->getRight();
+//         }
+//     }
+//     node->setParent(y);
+//     if (y == nullptr) {
+//         root.reset(node);
+//     } else if (cmp(node->getKey(), y->getKey())) {
+//         y->setLeft(std::move(node));
+//     } else {
+//         y->setRight(std::move(node));
+//     }
+//     insert_fixup(node);
+// }
 
 // Useful functions
 template <typename T>
