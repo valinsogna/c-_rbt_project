@@ -81,8 +81,8 @@ class RBTree {
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
     void rotate(std::unique_ptr<Node<T>>&& x, side s);
     bool delete(Node<T>*); 
-    void insert_fixup(std::unique_ptr<Node<T>>&& node);
-
+    void insert_fixup(std::unique_ptr<Node<T>>&&);
+    
     public:
     // ctor
     RBTree() noexcept : cmp{std::less<T>()}{}

@@ -119,6 +119,30 @@ Node<T>* RBTree<T,CMP>::transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y){
     return x;
 }
 
+template <typename T, typename CMP>
+void RBTree<T,CMP>::insert_fixup(std::unique_ptr<Node<T>>&& node){
+    while (!node->is_root() && node->parent->getColor() == Color::red) {
+        auto uncle = node->get_uncle();
+        if (uncle && uncle->getColor() == Color::red) {
+            //Case 1: uncle is red
+            node->parent->setColor(Color::black);
+            uncle->setColor(Color::black);
+            node->get_grandparent()->setColor(Color::red);
+            node = node->get_grandparent();
+        } else {
+            if (node->get_side() != node->parent->get_side()) {
+                //Case 2: uncle is black and node is outside
+                node = node->parent;
+                rotate(std::move(node), get_reverse_side(node->get_side()));
+            }
+            //Case 3: uncle is black and node is inside
+            node->parent->setColor(Color::black);
+            node->get_grandparent()->setColor(Color::red);
+            rotate(std::move(node->get_grandparent()), get_reverse_side(node->get_side()));
+        }
+    }
+    root->setColor(Color::black);
+};
 
 
 // Useful functions
