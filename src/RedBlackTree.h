@@ -56,22 +56,42 @@ class Node {
 };
 
 // Class to represent Red-Black Tree
-template <typename T, typename CMP=std::less<T>>
+template <typename T, typename CMP=std::less<T>()>
 class RBTree {
     std::unique_ptr< Node<T>> root;
     CMP cmp;
 
+    // useful private methods 
+    const Node<T>* search_subtree(Node<T>*, const T&) const;
+    void insert(std::unique_ptr<Node<T>>); //to insert a new value in the tree;
+    bool contains(const T& ) const; //to test whether the tree contains a value;
+    bool delete(Node<T>* ); //to delete a value from the tree;
+
     public:
-    // default ctor
-    RBTree(){}
+    // ctor
+    RBTree() : cmp{std::less<T>()}{}
     // default dtor
     ~RBTree() = default;
 
+    // some functions
+    Node<T>* minimum_in_subtree(Node<T>*) const;
+    Node<T>* maximum_in_subtree(Node<T>*) const;
+    Node<T>* successor(const Node<T>*) const;
 
-    // useful methods 
-    void insert(const T& value); //to insert a new value in the tree;
-    bool contains(const T& value) const; //to test whether the tree contains a value;
-    bool delete_value(const T& value); //to delete a value from the tree;
+    // useful public methods
+    Node<T>* search_subtree(const T& key) const{
+        return search_subtree(root.get(), key);
+    }
+
+    void insert(const T& key) {
+        auto z = std::make_unique<Node<T>>(key);
+        insert(std::move(z));
+    }
+
+    void delete(const T& key) {
+        auto z = search_subtree(key);
+        delete(z);
+    }
 };
 
 template <typename T>
