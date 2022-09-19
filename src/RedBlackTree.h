@@ -43,9 +43,13 @@ class Node {
     // setters
     void setKey(const T& key) { this->key = key; }
     void setColor(const Color col) { this=nullptr? this->color = Color::black : this->color = col; } // NIL nodes are black
-    void setLeft(std::unique_ptr< Node<T> > left) { this->left.reset(left) ; } // TO EDIT?
-    void setRight(std::unique_ptr< Node<T> > right) { this->right.reset(right); } // TO EDIT?
+    void setLeft(std::unique_ptr< Node<T> > left) { this->left.reset(left) ; } // Use std::move to call this function on a smart ptr
+    void setRight(std::unique_ptr< Node<T> > right) { this->right.reset(right); } // Use std::move to call this function on a smart ptr
     void setParent( Node<T> *parent) { this->parent = parent; }
+    void setChild(side s, std::unique_ptr< Node<T> > child) { // Use std::move to call this function on a smart ptr
+        if (s == side::left) left.reset(child); else right.reset(child);
+        if (child) child->parent = this; 
+    }
 
     // useful functions
     bool is_root() const { return parent == nullptr; }
@@ -72,6 +76,7 @@ class RBTree {
     // useful private methods 
     const Node<T>* search_subtree(Node<T>*, const T&) const;
     void insert(std::unique_ptr<Node<T>>);
+    Node<T>* transplant(Node<T>*, std::unique_ptr<Node<T>>&&);
     bool delete(Node<T>*); 
 
     public:
@@ -89,17 +94,7 @@ class RBTree {
     Node<T>* search_subtree(const T& key) const{ return search_subtree(root.get(), key);};
 
     // To insert a new value in the tree:
-    void insert(const T& key) {
-        auto z = std::make_unique<Node<T>>(key);
-        try {
-            insert(std::move(z));
-        } catch (const Multi_insert& e) {
-            std::cerr << e.what() << std::endl;
-        } catch (...) {
-            std::cerr << "Unknown exception. Aborting.\n";
-            //std::abort();
-        }
-    }
+    void insert(const T&);
 
     // To test whether the tree contains a value:
     bool contains(const T& key) const{ return search_subtree(key) != nullptr;}; 
