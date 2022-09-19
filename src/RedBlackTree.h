@@ -56,14 +56,14 @@ class Node {
     bool is_leaf() const { return left == nullptr && right == nullptr; }
     bool is_right_child() const { return !this->is_root() && parent->right == this; }
     
-    Node<T>* get_sibling() const { return is_right_child() ? parent->left : parent->right; }
+    std::unique_ptr<Node<T>> get_sibling() const { return is_right_child() ? parent->left : parent->right; }
     // gets the side of the node relative to its parent:
     side get_side() const { return is_right_child() ? side::right : side::left; }
     // reverse the side:
     side get_opposite_side() const { return !this->get_side(); }
     // gets the child on side s:
-    Node<T>* get_child(side s) const { return s == side::left ? left : right; }
-    Node<T>* get_uncle() const { return this->parent->get_sibling(); }
+    std::unique_ptr<Node<T>> get_child(side s) const { return s == side::left ? left : right; }
+    std::unique_ptr<Node<T>> get_uncle() const { return this->parent->get_sibling(); }
     Node<T>* get_grandparent() const { return parent->parent; }
 };
 
@@ -76,7 +76,24 @@ class RBTree {
     // useful private methods 
     const Node<T>* search_subtree(Node<T>*, const T&) const;
     void insert(std::unique_ptr<Node<T>>);
-    Node<T>* transplant(Node<T>*, std::unique_ptr<Node<T>>&&);
+    // Replace x by y in the tree. It returns the ptr to the removed x:
+    Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
+
+    void rotate(std::unique_ptr<Node<T>>&& x, side s){
+        side r_s = x->get_opposite_side();
+
+        auto y = std::move(x->get_child(r_s));
+        auto removed_x = transplant( x.get(), std::move(y));
+
+        auto beta = std::move(y->get_child(s));
+        auto removed_y = transplant( beta.get(), std::move(y));
+
+        x->setChild(r_s, std::move(beta));
+
+        delete removed_x;
+        delete removed_y;
+    }
+
     bool delete(Node<T>*); 
 
     public:

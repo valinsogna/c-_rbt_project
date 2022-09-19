@@ -70,15 +70,13 @@ void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
     node->setParent(y);
     if (y == nullptr) {
         root.reset(node);
-        x.setColour(Color::black);
     } else if (cmp(node->getKey(), y->getKey())) {
         y->setLeft(std::move(node));
-        x.setColour(Color::red);
     } else {
         y->setRight(std::move(node));
-        x.setColour(Color::red);
     }
     // Restore RB properties:
+    node.setColour(Color::red);
     insert_fixup(node);
 }
 
