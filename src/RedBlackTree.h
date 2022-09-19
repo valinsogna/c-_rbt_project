@@ -8,7 +8,7 @@
 
 enum class Color : bool {black, red};
 enum class side : bool {left, right};
-side get_reverse_side(const side s) { return s == side::right? side::left : side::right; }
+side get_reverse_side(const side s) { return s == side::right? side::left : side::right; };
 
 struct Multi_insert {
     std::string message;
