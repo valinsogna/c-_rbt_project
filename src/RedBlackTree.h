@@ -5,6 +5,7 @@
 #include <functional> // for std::less
 #include <string>
 #include <iostream>
+#include "RedBlackTree_iterator.h"
 
 enum class Color : bool {black, red};
 enum class side : bool {left, right};
@@ -92,6 +93,10 @@ class RBTree {
     RBTree() noexcept : cmp{std::less<T>()}{}
     // default dtor
     ~RBTree() noexcept = default;
+
+    using const_iterator = const_iterator<RBTree, const T>; //const ref returned
+    auto begin() const { return const_iterator{root.get()}; } 
+    auto end() const { return const_iterator{nullptr}; }
 
     // PUBLIC METHODS
     Node<T>* minimum_in_subtree(Node<T>*) const;

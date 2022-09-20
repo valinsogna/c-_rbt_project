@@ -43,6 +43,17 @@ int main() {
     std::cout << "Print tree:\n";
     std::cout << rbtree << std::endl;
 
+    std::cout << "Find : 7\n";
+    auto it = std::find(rbtree.begin(), rbtree.end(), 7);
+    if (it != rbtree.end())
+      std::cout << "Found " << *it << std::endl;
+
+    std::cout << "Find : 70\n";
+    it = std::find(rbtree.begin(), rbtree.end(), 70);
+    if (it != rbtree.end())
+      std::cout << "Found " << *it << std::endl;
+
+
     std::shuffle(v.begin(), v.end(), gen);
 
     t1 = std::chrono::steady_clock::now();
