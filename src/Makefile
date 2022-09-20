@@ -17,7 +17,7 @@ main.o: main.cpp RedBlackTree.h
 RedBlackTree.o : RedBlackTree.cpp RedBlackTree.h
 	g++ -c RedBlackTree.cpp -o RedBlackTree.o $(CXXFLAGS)
 
-RedBlackTree_iterator.o: RedBlackTree.cpp RedBlackTree.h
+RedBlackTree_iterator.o: RedBlackTree_iterator.cpp RedBlackTree.h
 	g++ -c RedBlackTree_iterator.cpp -o RedBlackTree_iterator.o $(CXXFLAGS)
 
 clean:
