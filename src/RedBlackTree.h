@@ -81,71 +81,11 @@ class RBTree {
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
     void rotate(std::unique_ptr<Node<T>>&& x, side s);
     void insert_fixup(std::unique_ptr<Node<T>>&&);
-
-    void delete_fixup(std::unique_ptr<Node<T>>&& node){
-        while (node != root && node->getColor() == Color::black) {
-            auto s = node->get_side();
-            auto w = node->get_sibling();
-            if (w->getColor() == Color::red){
-                //Case 1
-                w->setColor(Color::black);
-                node->getParent()->setColor(Color::red);
-                rotate(std::move(node->getParent()), s);
-            }else{
-                auto r_s = get_reverse_side(s);
-                if(w->get_child(r_s)->getColor() == Color::red){
-                    //Case 4
-                    w->get_child(r_s)->setColor(Color::black);
-                    w->setColor(node->getParent()->getColor());
-                    node->getParent()->setColor(Color::black);
-                    rotate(std::move(node->getParent()), s);
-                    return;
-                }else{
-                    if(w->get_child(s)->getColor() == Color::red){
-                        //Case 3
-                        w->get_child(s)->setColor(Color::black);
-                        w->setColor(Color::red);
-                        rotate(std::move(w), r_s);
-                    }else{
-                        //Case 2
-                        w->setColor(Color::red);
-                        node = node->getParent();
-                    }
-                }
-            }
-        }
-    }
-
+    void delete_fixup(std::unique_ptr<Node<T>>&&);
     // Delete a node form a Binary Search tree:
-    Node<T>* Delete_BTS(Node<T>* node){
-        if (node->getLeft() == nullptr) {
-            delete transplant(node, std::move(node->getRight()));
-            return node;
-        } else if (node->getRight() == nullptr) {
-            delete transplant(node, std::move(node->getLeft()));
-            return node;
-        } 
-        auto y = minimum_in_subtree(node->getRight().get());
-        node->setKey(y->getKey());
-        return Delete_BTS(y);
-    }
-
+    Node<T>* Delete_BTS(Node<T>* );
     // Delete a node form a Red Black tree:
-    bool Delete(Node<T>* node){
-        if (node == nullptr) return false;
-        auto y = Delete_BTS(node);
-        if (y->getColor() == Color::black) {
-            std::unique_ptr<Node<T>> x;
-            if(y->getLeft() == nullptr) 
-                auto x = y->getRight();
-            else 
-                auto x = y->getLeft();
-
-            delete_fixup(std::move(x));
-        }
-        delete y;
-        return true;      
-    }
+    bool Delete(Node<T>*);
 
     public:
     // ctor

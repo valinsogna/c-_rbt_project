@@ -3,7 +3,7 @@
 
 #include "RedBlackTree.h"
 
-// Methods for RBTree class
+//RED BLACK TREE CLASS METHODS
 template <typename T, typename CMP>
 Node<T>* RBTree<T, CMP>::minimum_in_subtree(Node<T>* node) const {    
     if (!node) {
@@ -144,8 +144,73 @@ void RBTree<T,CMP>::insert_fixup(std::unique_ptr<Node<T>>&& node){
     root->setColor(Color::black);
 };
 
+template <typename T, typename CMP>
+Node<T>* RBTree<T,CMP>::Delete_BTS(Node<T>* node){
+    if (node->getLeft() == nullptr) {
+        delete transplant(node, std::move(node->getRight()));
+        return node;
+    } else if (node->getRight() == nullptr) {
+        delete transplant(node, std::move(node->getLeft()));
+        return node;
+    } 
+    auto y = minimum_in_subtree(node->getRight().get());
+    node->setKey(y->getKey());
+    return Delete_BTS(y);
+}
 
-// Useful functions
+template <typename T, typename CMP>
+bool RBTree<T,CMP>::Delete(Node<T>* node){
+    if (node == nullptr) return false;
+    auto y = Delete_BTS(node);
+    if (y->getColor() == Color::black) {
+        std::unique_ptr<Node<T>> x;
+        if(y->getLeft() == nullptr) 
+            auto x = y->getRight();
+        else 
+            auto x = y->getLeft();
+        delete_fixup(std::move(x));
+    }
+    delete y;
+    return true;      
+}
+
+template <typename T, typename CMP>
+void RBTree<T,CMP>::delete_fixup(std::unique_ptr<Node<T>>&& node){
+    while (node != root && node->getColor() == Color::black) {
+        auto s = node->get_side();
+        auto w = node->get_sibling();
+        if (w->getColor() == Color::red){
+            //Case 1
+            w->setColor(Color::black);
+            node->getParent()->setColor(Color::red);
+            rotate(std::move(node->getParent()), s);
+        }else{
+            auto r_s = get_reverse_side(s);
+            if(w->get_child(r_s)->getColor() == Color::red){
+                //Case 4
+                w->get_child(r_s)->setColor(Color::black);
+                w->setColor(node->getParent()->getColor());
+                node->getParent()->setColor(Color::black);
+                rotate(std::move(node->getParent()), s);
+                return;
+            }else{
+                if(w->get_child(s)->getColor() == Color::red){
+                    //Case 3
+                    w->get_child(s)->setColor(Color::black);
+                    w->setColor(Color::red);
+                    rotate(std::move(w), r_s);
+                }else{
+                    //Case 2
+                    w->setColor(Color::red);
+                    node = node->getParent();
+                }
+            }
+        }
+    }
+}
+
+
+// USEFUL FUNCTIONS:
 template <typename T>
 void inorder_walk_aux(const std::unique_ptr< Node<T> > node) {
     if (node == nullptr) return;
