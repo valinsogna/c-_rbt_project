@@ -8,7 +8,7 @@ all: $(EXE)
 
 .PHONY: all
 
-main.x: main.o RedBlackTree.o RedBlackTree_iterator.o
+main.x: main.o RedBlackTree.o
 	g++ main.o RedBlackTree.o -o main.x
 
 main.o: main.cpp RedBlackTree.h
@@ -16,9 +16,6 @@ main.o: main.cpp RedBlackTree.h
 
 RedBlackTree.o : RedBlackTree.cpp RedBlackTree.h
 	g++ -c RedBlackTree.cpp -o RedBlackTree.o $(CXXFLAGS)
-
-RedBlackTree_iterator.o: RedBlackTree_iterator.cpp RedBlackTree.h
-	g++ -c RedBlackTree_iterator.cpp -o RedBlackTree_iterator.o $(CXXFLAGS)
 
 clean:
 	rm -f $(EXE) *~

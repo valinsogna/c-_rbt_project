@@ -3,7 +3,7 @@
 
 #include "RedBlackTree.h"
 
-//RED BLACK TREE CLASS METHODS
+// RBTree PUBLIC METHODS
 template <typename T, typename CMP>
 Node<T>* RBTree<T, CMP>::minimum_in_subtree(Node<T>* node) const {    
     if (!node) {
@@ -31,65 +31,12 @@ Node<T>* RBTree<T,CMP>::successor(const Node<T>* node) const{
     if (node->right) {
         return minimum_in_subtree(node->right);
     }
-    Node<T>* parent = node->getParent();
+    Node<T>* parent = node->parent;
     while (parent && node->is_right_child()) {
         node = parent;
-        parent = parent->getParent();
+        parent = parent->parent;
     }
     return parent;
-}
-
-template <typename T, typename CMP>
-Node<T>* RBTree<T,CMP>::search_subtree(Node<T>* node, const T& key) const{
-    if(!node || key == node->getKey())
-        return node;
-    if(cmp(key, node->getKey()))
-        return search(node->getLeft().get(), key); //Check if .get() is needed
-    else
-        return search(node->getRight().get(), key); //Check if .get() is needed
-}
-
-template <typename T, typename CMP>
-void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
-    auto x = root.get();
-    auto y = root.get();
-    while (x != nullptr) {
-        y = x;
-        if (cmp(node->getKey(), x->getKey())) {
-            if (cmp(x->getKey(), node->getKey())){
-                throw Multi_insert{
-                    "Cannot handle multiple insertions. You gave me " +
-                    std::to_string(x->getKey())
-                };
-            }
-            x = x->getLeft();
-        } else {
-            x = x->getRight();
-        }
-    }
-    node->setParent(y);
-    if (y == nullptr) {
-        root.reset(node);
-    } else if (cmp(node->getKey(), y->getKey())) {
-        y->setLeft(std::move(node));
-    } else {
-        y->setRight(std::move(node));
-    }
-    // Restore RB properties:
-    node.setColour(Color::red);
-    insert_fixup(std::move(node));
-}
-
-template <typename T, typename CMP>
-void RBTree<T,CMP>::rotate(std::unique_ptr<Node<T>>&& x, side s){
-    side r_s = get_reverse_side(s);
-    auto y = std::move(x->get_child(r_s));
-    auto removed_x = transplant( x.get(), std::move(y));
-    auto beta = std::move(y->get_child(s));
-    auto removed_y = transplant( beta.get(), std::move(y));
-    x->setChild(r_s, std::move(beta));
-    delete removed_x;
-    delete removed_y;
 }
 
 template <typename T, typename CMP>
@@ -105,112 +52,339 @@ void RBTree<T,CMP>::insert(const T& key) {
     }
 }
 
+
+// RBTree PRIVATE METHODS
 template <typename T, typename CMP>
-Node<T>* RBTree<T,CMP>::transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y){
-    if (x->is_root()){
-        root = std::move(y);
-        if(y){
-            y.setParent(nullptr);
-        }
-    } else {
-        side x_side = x->get_side();
-        x->getParent()->setChild(x_side, std::move(y));
-    } 
-    return x;
+Node<T>* RBTree<T,CMP>::search_subtree(Node<T>* node, const T& key) const{
+    if(!node || key == node->key)
+        return node;
+    if(cmp(key, node->key))
+        return search_subtree(node->left.get(), key);
+    else
+        return search_subtree(node->right.get(), key);
 }
 
 template <typename T, typename CMP>
-void RBTree<T,CMP>::insert_fixup(std::unique_ptr<Node<T>>&& node){
-    while (!node->is_root() && node->parent->getColor() == Color::red) {
-        auto uncle = node->get_uncle();
-        if (uncle && uncle->getColor() == Color::red) {
-            //Case 1: uncle is red
-            node->parent->setColor(Color::black);
-            uncle->setColor(Color::black);
-            node->get_grandparent()->setColor(Color::red);
-            node = node->get_grandparent();
-        } else {
-            if (node->get_side() != node->parent->get_side()) {
-                //Case 2: uncle is black and node is outside
-                node = node->parent;
-                rotate(std::move(node), get_reverse_side(node->get_side()));
+void RBTree<T,CMP>::insert(std::unique_ptr<Node<T>> node){
+    Node<T>* x = root.get();
+    Node<T>* y = root.get();
+    while (x) {
+        y = x;
+        if (cmp(node->key, x->key)) {
+            if (cmp(x->key, node->key)){
+                throw Multi_insert{
+                    "Cannot handle multiple insertions. You gave me " +
+                    std::to_string(x->key)
+                };
             }
-            //Case 3: uncle is black and node is inside
-            node->parent->setColor(Color::black);
-            node->get_grandparent()->setColor(Color::red);
-            rotate(std::move(node->get_grandparent()), get_reverse_side(node->get_side()));
+            x = x->left.get();
+        } else {
+            x = x->right.get();
         }
     }
-    root->setColor(Color::black);
-};
-
-template <typename T, typename CMP>
-Node<T>* RBTree<T,CMP>::Delete_BTS(Node<T>* node){
-    if (node->getLeft() == nullptr) {
-        delete transplant(node, std::move(node->getRight()));
-        return node;
-    } else if (node->getRight() == nullptr) {
-        delete transplant(node, std::move(node->getLeft()));
-        return node;
-    } 
-    auto y = minimum_in_subtree(node->getRight().get());
-    node->setKey(y->getKey());
-    return Delete_BTS(y);
-}
-
-template <typename T, typename CMP>
-bool RBTree<T,CMP>::Delete(Node<T>* node){
-    if (node == nullptr) return false;
-    auto y = Delete_BTS(node);
-    if (y->getColor() == Color::black) {
-        std::unique_ptr<Node<T>> x;
-        if(y->getLeft() == nullptr) 
-            auto x = y->getRight();
-        else 
-            auto x = y->getLeft();
-        delete_fixup(std::move(x));
+    node->parent = y;
+    // Restore RB properties:
+    if (!y) {
+        root = std::move(node);
+        insert_fixup(std::move(root));
+    } else if (cmp(node->key, y->key)) {
+        y->left = std::move(node);
+        insert_fixup(std::move(y->left));
+    } else {
+        y->right = std::move(node);
+        insert_fixup(std::move(y->right));
     }
-    delete y;
-    return true;      
 }
 
 template <typename T, typename CMP>
-void RBTree<T,CMP>::delete_fixup(std::unique_ptr<Node<T>>&& node){
-    while (node != root && node->getColor() == Color::black) {
-        auto s = node->get_side();
-        auto w = node->get_sibling();
-        if (w->getColor() == Color::red){
-            //Case 1
-            w->setColor(Color::black);
-            node->getParent()->setColor(Color::red);
-            rotate(std::move(node->getParent()), s);
-        }else{
-            auto r_s = get_reverse_side(s);
-            if(w->get_child(r_s)->getColor() == Color::red){
-                //Case 4
-                w->get_child(r_s)->setColor(Color::black);
-                w->setColor(node->getParent()->getColor());
-                node->getParent()->setColor(Color::black);
-                rotate(std::move(node->getParent()), s);
-                return;
-            }else{
-                if(w->get_child(s)->getColor() == Color::red){
-                    //Case 3
-                    w->get_child(s)->setColor(Color::black);
-                    w->setColor(Color::red);
-                    rotate(std::move(w), r_s);
-                }else{
-                    //Case 2
-                    w->setColor(Color::red);
-                    node = node->getParent();
+void RBTree<T,CMP>::rotate_left(std::unique_ptr<Node<T>>&& x){
+    auto y = std::move(x->right);
+    x->right = std::move(y->left);
+    if (x->right) {
+        x->right->parent = x.get();
+    }
+    y->parent = x->parent;
+    auto xp = x->parent;
+    if (!xp) {
+        auto px = x.release();
+        root = std::move(y);
+        root->left = std::unique_ptr<Node<T>>(px);
+        root->left->parent = root.get();
+    } else if (x == xp->left) {
+        auto px = x.release();
+        xp->left = std::move(y);
+        xp->left->left = std::unique_ptr<Node<T>>(px);
+        xp->left->left->parent = xp->left.get();
+    } else {
+        auto px = x.release();
+        xp->right = std::move(y);
+        xp->right->left = std::unique_ptr<Node<T>>(px);
+        xp->right->left->parent = xp->right.get();
+    }
+}
+
+template <typename T, typename CMP>
+void RBTree<T,CMP>::rotate_right(std::unique_ptr<Node<T>>&& x){
+    auto y = std::move(x->left);
+    x->left = std::move(y->right);
+    if (x->left) {
+        x->left->parent = x.get();
+    }
+    y->parent = x->parent;
+    auto xp = x->parent;
+    if (!xp) {
+        auto px = x.release();
+        root = std::move(y);
+        root->right = std::unique_ptr<Node<T>>(px);
+        root->right->parent = root.get();
+    } else if (x == xp->left) {
+        auto px = x.release();
+        xp->left = std::move(y);
+        xp->left->right = std::unique_ptr<Node<T>>(px);
+        xp->left->right->parent = xp->left.get();
+    } else {
+        auto px = x.release();
+        xp->right = std::move(y);
+        xp->right->right = std::unique_ptr<Node<T>>(px);
+        xp->right->right->parent = xp->right.get();
+    }
+}
+
+template <typename T, typename CMP>
+void RBTree<T,CMP>::insert_fixup(std::unique_ptr<Node<T>>&& z){
+    auto zp = z->parent;
+    while (zp && zp->color == Color::red) {
+        auto zpp = zp->parent;
+        if (zp == zpp->left.get()) {
+            auto y = zpp->right.get();
+            if (y && y->color == Color::red) {
+                zp->color = Color::black;
+                y->color = Color::black;
+                zpp->color = Color::red;
+                zp = zpp->parent;
+            } else {
+                if (z == zp->right) {
+                    rotate_left(std::move(zpp->left));
+                    zp = zpp->left.get();
+                }
+                zp->color = Color::black;
+                zpp->color = Color::red;
+                auto zppp = zpp->parent;
+                if (!zppp) {
+                    rotate_right(std::move(root));
+                } else if (zpp == zppp->left.get()) {
+                    rotate_right(std::move(zppp->left));
+                } else {
+                    rotate_right(std::move(zppp->right));
+                }
+            }
+        } else {
+            auto y = zpp->left.get();
+            if (y && y->color == Color::red) {
+                zp->color = Color::black;
+                y->color = Color::black;
+                zpp->color = Color::red;
+                zp = zpp->parent;
+            } else {
+                if (z == zp->left) {
+                    rotate_right(std::move(zpp->right));
+                    zp = zpp->right.get();
+                }
+                zp->color = Color::black;
+                zpp->color = Color::red;
+                auto zppp = zpp->parent;
+                if (!zppp) {
+                    rotate_left(std::move(root));
+                } else if (zpp == zppp->left.get()) {
+                    rotate_left(std::move(zppp->left));
+                } else {
+                    rotate_left(std::move(zppp->right));
                 }
             }
         }
     }
+    root->color = Color::black;
+};
+
+template <typename T, typename CMP>
+Node<T>* RBTree<T,CMP>::transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y){
+    if (y) {
+        y->parent = x->parent;
+    }
+    Node<T>* w = nullptr;
+    if (!x->parent) {
+        w = root.release();
+        root = std::move(y);
+    } else if (x == x->parent->left.get()) {
+        w = x->parent->left.release();
+        x->parent->left = std::move(y);
+    } else {
+        w = x->parent->right.release();
+        x->parent->right = std::move(y);
+    }
+    return w;
 }
 
+template <typename T, typename CMP>
+bool RBTree<T,CMP>::Delete(Node<T>* z){
+    if (!z) {
+        return false;
+    }
+    Color orig_color = z->color;
+    Node<T>* x = nullptr;
+    Node<T>* xp = nullptr;
+    if (!z->left) {
+        x = z->right.get();
+        xp = z->parent;
+        delete transplant(z, std::move(z->right));
+    } else if (!z->right) {
+        x = z->left.get();
+        xp = z->parent;
+        auto pz = transplant(z, std::move(z->left));
+        auto upz = std::unique_ptr<Node<T>>(pz);
+    } else {
+        auto y = minimum_in_subtree(z->right.get());
+        orig_color = y->color;
+        x = y->right.get();
+        xp = y;
+        if (y->parent == z) {
+            if (x) {
+                x->parent = y;
+            }
+            auto pz = transplant(z, std::move(z->right));
+            y->left = std::move(pz->left);
+            y->left->parent = y;
+            y->color = pz->color;
+            auto upz = std::unique_ptr<Node<T>>(pz);
+        } else {
+            xp = y->parent;
+            auto py = transplant(y, std::move(y->right));
+            py->right = std::move(z->right);
+            py->right->parent = py;
+            auto upy = std::unique_ptr<Node<T>>(py);
+            auto pz = transplant(z, std::move(upy));
+            py->left = std::move(pz->left);
+            py->left->parent = py;
+            py->color = pz->color;
+            auto upz = std::unique_ptr<Node<T>>(pz);
+        }
+    }
+    if (orig_color == Color::black) {
+        delete_fixup(x, xp);
+    }
+    return true;
+}
 
-// USEFUL FUNCTIONS:
+template <typename T, typename CMP>
+void RBTree<T,CMP>::delete_fixup(Node<T>* x, Node<T>* xp){
+    while (x != root.get() && (!x || x->color == Color::black)) {
+        if (x == xp->left.get()) {
+            Node<T>* w = xp->right.get();
+            if (w && w->color == Color::red) {
+                w->color = Color::black;
+                xp->color = Color::red;
+                auto xpp = xp->parent;
+                if (!xpp) {
+                    rotate_left(std::move(root));
+                } else if (xp == xpp->left.get()) {
+                    rotate_left(std::move(xpp->left));
+                } else {
+                    rotate_left(std::move(xpp->right));
+                }
+                w = xp->right.get();
+            }
+            if (w && (!w->left || w->left->color == Color::black)
+                && (!w->right || w->right->color == Color::black)) {
+                w->color = Color::red;
+                x = xp;
+                xp = xp->parent;
+            } else if (w) {
+                if (!w->right || w->right->color == Color::black) {
+                    w->left->color = Color::black;
+                    w->color = Color::red;
+                    auto wp = w->parent;
+                    if (!wp) {
+                        rotate_right(std::move(root));
+                    } else if (w == wp->left.get()) {
+                        rotate_right(std::move(wp->left));
+                    } else {
+                        rotate_right(std::move(wp->right));
+                    }
+                    w = xp->right.get();
+                }
+                w->color = xp->color;
+                xp->color = Color::black;
+                w->right->color = Color::black;
+                auto xpp = xp->parent;
+                if (!xpp) {
+                    rotate_left(std::move(root));
+                } else if (xp == xpp->left.get()) {
+                    rotate_left(std::move(xpp->left));
+                } else {
+                    rotate_left(std::move(xpp->right));
+                }
+                x = root.get();
+            } else {
+                x = root.get();
+            }
+        } else {
+            Node<T>* w = xp->left.get();
+            if (w && w->color == Color::red) {
+                w->color = Color::black;
+                xp->color = Color::red;
+                auto xpp = xp->parent;
+                if (!xpp) {
+                    rotate_right(std::move(root));
+                } else if (xp == xpp->left.get()) {
+                    rotate_right(std::move(xpp->left));
+                } else {
+                    rotate_right(std::move(xpp->right));
+                }
+                w = xp->left.get();
+            }
+            if (w && (!w->left || w->left->color == Color::black)
+                && (!w->right || w->right->color == Color::black)) {
+                w->color = Color::red;
+                x = xp;
+                xp = xp->parent;
+            } else if (w) {
+                if (!w->left || w->left->color == Color::black) {
+                    w->right->color = Color::black;
+                    w->color = Color::red;
+                    auto wp = w->parent;
+                    if (!wp) {
+                        rotate_left(std::move(root));
+                    } else if (w == wp->left.get()) {
+                        rotate_left(std::move(wp->left));
+                    } else {
+                        rotate_left(std::move(wp->right));
+                    }
+                    w = xp->left.get();
+                }
+                w->color = xp->color;
+                xp->color = Color::black;
+                w->left->color = Color::black;
+                auto xpp = xp->parent;
+                if (!xpp) {
+                    rotate_right(std::move(root));
+                } else if (xp == xpp->left.get()) {
+                    rotate_right(std::move(xpp->left));
+                } else {
+                    rotate_right(std::move(xpp->right));
+                }
+                x = root.get();
+            } else {
+                x = root.get();
+            }
+        }
+    }
+    if (x) {
+        x->color = Color::black;
+    }
+}    
+
+
+// USEFUL FUNCTIONS TO PRINT RBTree:
 template <typename T>
 std::ostream& operator<<(std::ostream& os, Node<T>* node) {
     if (node) {
@@ -232,17 +406,17 @@ std::ostream& operator<<(std::ostream& os, const RBTree<T,CMP>& tree) {
     return os;
 }
 
-template <typename T>
-void inorder_walk_aux(const std::unique_ptr< Node<T> > node) {
-    if (node == nullptr) return;
-    inorder_walk_aux(node->getLeft());
-    std::cout << node->getKey() << " ";
-    inorder_walk_aux(node->getRight());
+
+// RBTree ITERATOR:
+template <typename RBTree, typename T>
+const_iterator<RBTree,T>& const_iterator<RBTree,T>::operator++() {  // pre-increment ++i
+  current = current->right.get();
+  return *this;
 }
 
-template <typename T, typename CMP>
-void inorder_walk(const RBTree<T,CMP> tree) {
-    inorder_walk_aux(tree.root->getLeft());
-    std::cout << tree.root->getKey() << " ";
-    inorder_walk_aux(tree.root->getRight());
+template <typename RBTree, typename T>
+const_iterator<RBTree,T> const_iterator<RBTree,T>::operator++(int) {  // post-increment i++
+  auto tmp = *this;
+  ++(*this); // i++ is slower than ++i since it first return the copy and then increment it!
+  return tmp;
 }
