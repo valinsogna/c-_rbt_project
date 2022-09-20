@@ -80,9 +80,67 @@ class RBTree {
     // Replace x by y in the tree. It returns the ptr to the removed x:
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
     void rotate(std::unique_ptr<Node<T>>&& x, side s);
-    bool delete(Node<T>*); 
     void insert_fixup(std::unique_ptr<Node<T>>&&);
-    
+    void delete_fixup(std::unique_ptr<Node<T>>&& node){
+        while (node != root && node->getColor() == Color::black) {
+            auto s = node->get_side();
+            auto w = node->get_sibling();
+            if (w->getColor() == Color::red) {
+                w->setColor(Color::black);
+                node->getParent()->setColor(Color::red);
+                rotate(std::move(node->getParent()), get_reverse_side(s));
+                w = node->get_sibling();
+            }
+            if (w->getLeft()->getColor() == Color::black && w->getRight()->getColor() == Color::black) {
+                w->setColor(Color::red);
+                node = node->getParent();
+            } else {
+                if (w->get_child(get_reverse_side(s))->getColor() == Color::black) {
+                    w->get_child(s)->setColor(Color::black);
+                    w->setColor(Color::red);
+                    rotate(std::move(w), get_reverse_side(s));
+                    w = node->get_sibling();
+                }
+                w->setColor(node->getParent()->getColor());
+                node->getParent()->setColor(Color::black);
+                w->get_child(get_reverse_side(s))->setColor(Color::black);
+                rotate(std::move(node->getParent()), s);
+                node = root;
+            }
+        }
+        node->setColor(Color::black);
+    }
+
+    // Delete a node form a Binary Search tree:
+    Node<T>* Delete_BTS(Node<T>* node){
+        if (node->getLeft() == nullptr) {
+            delete transplant(node, std::move(node->getRight()));
+            return node;
+        } else if (node->getRight() == nullptr) {
+            delete transplant(node, std::move(node->getLeft()));
+            return node;
+        } 
+        auto y = minimum_in_subtree(node->getRight().get());
+        node->setKey(y->getKey());
+        return Delete_BTS(y);
+    }
+
+    bool Delete(Node<T>* node){
+        if (node == nullptr) return false;
+        auto y = Delete_BTS(node);
+        if (y->getColor() == Color::black) {
+            std::unique_ptr<Node<T>> x;
+            if(y->getLeft() == nullptr) 
+                auto x = y->getRight();
+            else 
+                auto x = y->getLeft();
+
+            delete_fixup(std::move(x));
+        }
+        delete y;
+        return true;      
+    }
+
     public:
     // ctor
     RBTree() noexcept : cmp{std::less<T>()}{}
@@ -104,9 +162,9 @@ class RBTree {
     bool contains(const T& key) const{ return search_subtree(key) != nullptr;}; 
 
     // To delete a value from the tree:      
-    bool delete(const T& key) {
+    bool Delete(const T& key) {
         auto z = search_subtree(key);
-        return delete(z);
+        return Delete(z);
     }
 };
 
