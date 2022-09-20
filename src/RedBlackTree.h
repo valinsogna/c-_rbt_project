@@ -81,34 +81,39 @@ class RBTree {
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
     void rotate(std::unique_ptr<Node<T>>&& x, side s);
     void insert_fixup(std::unique_ptr<Node<T>>&&);
+
     void delete_fixup(std::unique_ptr<Node<T>>&& node){
         while (node != root && node->getColor() == Color::black) {
             auto s = node->get_side();
             auto w = node->get_sibling();
-            if (w->getColor() == Color::red) {
+            if (w->getColor() == Color::red){
+                //Case 1
                 w->setColor(Color::black);
                 node->getParent()->setColor(Color::red);
-                rotate(std::move(node->getParent()), get_reverse_side(s));
-                w = node->get_sibling();
-            }
-            if (w->getLeft()->getColor() == Color::black && w->getRight()->getColor() == Color::black) {
-                w->setColor(Color::red);
-                node = node->getParent();
-            } else {
-                if (w->get_child(get_reverse_side(s))->getColor() == Color::black) {
-                    w->get_child(s)->setColor(Color::black);
-                    w->setColor(Color::red);
-                    rotate(std::move(w), get_reverse_side(s));
-                    w = node->get_sibling();
-                }
-                w->setColor(node->getParent()->getColor());
-                node->getParent()->setColor(Color::black);
-                w->get_child(get_reverse_side(s))->setColor(Color::black);
                 rotate(std::move(node->getParent()), s);
-                node = root;
+            }else{
+                auto r_s = get_reverse_side(s);
+                if(w->get_child(r_s)->getColor() == Color::red){
+                    //Case 4
+                    w->get_child(r_s)->setColor(Color::black);
+                    w->setColor(node->getParent()->getColor());
+                    node->getParent()->setColor(Color::black);
+                    rotate(std::move(node->getParent()), s);
+                    return;
+                }else{
+                    if(w->get_child(s)->getColor() == Color::red){
+                        //Case 3
+                        w->get_child(s)->setColor(Color::black);
+                        w->setColor(Color::red);
+                        rotate(std::move(w), r_s);
+                    }else{
+                        //Case 2
+                        w->setColor(Color::red);
+                        node = node->getParent();
+                    }
+                }
             }
         }
-        node->setColor(Color::black);
     }
 
     // Delete a node form a Binary Search tree:
@@ -125,6 +130,7 @@ class RBTree {
         return Delete_BTS(y);
     }
 
+    // Delete a node form a Red Black tree:
     bool Delete(Node<T>* node){
         if (node == nullptr) return false;
         auto y = Delete_BTS(node);
