@@ -46,9 +46,9 @@ int main() {
     std::shuffle(v.begin(), v.end(), gen);
 
     t1 = std::chrono::steady_clock::now();
-    // for (auto n : v) {
-    //     rbtree.Delete(n);
-    // }
+    for (auto n : v) {
+        rbtree.Delete(n);
+    }
     t2 = std::chrono::steady_clock::now();
     auto dt3 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 
