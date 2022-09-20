@@ -15,6 +15,15 @@
 
 Implementation of Red-Black Tree class and its iterator in c++
 
+## Compile and Run
+
+- to compile type command `make`
+- to run type command `./RBTree.x`
+- to delete executable type command `make clean`
+
+## Repository structure
+You will find the implementation of the class Red-Black Tree and its iterator inside file `RBTree.cpp` along with a test inside the main. 
+
 ## Introduction
 Red-Black Trees are binary search trees satisfying the following conditions:
 - every node is either red or black;
