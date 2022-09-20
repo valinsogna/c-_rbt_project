@@ -398,13 +398,14 @@ std::ostream& operator<<(std::ostream& os, const RBTree<T>& tree) {
 }
 
 int main() {
-    constexpr size_t SIZE = 100'000;
+    constexpr size_t SIZE = 100;//100'000;
     std::vector<int> v (SIZE);
     std::iota(v.begin(), v.end(), 1);
     std::shuffle(v.begin(), v.end(), gen);
     RBTree<int> rbtree;
     auto t1 = std::chrono::steady_clock::now();
     for (auto n : v) {
+        //std::cout << n <<std::endl;
         rbtree.Insert(n);
     }
     auto t2 = std::chrono::steady_clock::now();
@@ -421,6 +422,8 @@ int main() {
     std::cout << "Inserting " << SIZE << " elements:\n";
     std::cout << "unique ptr red-black tree : " << dt1.count() << " ms\n";
     std::cout << "standard red-black tree : " << dt2.count() << " ms\n";
+
+    std::cout << rbtree << std::endl;
 
     std::shuffle(v.begin(), v.end(), gen);
 

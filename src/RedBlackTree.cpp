@@ -40,7 +40,7 @@ Node<T>* RBTree<T,CMP>::successor(const Node<T>* node) const{
 }
 
 template <typename T, typename CMP>
-const Node<T>* RBTree<T,CMP>::search_subtree(Node<T>* node, const T& key) const{
+Node<T>* RBTree<T,CMP>::search_subtree(Node<T>* node, const T& key) const{
     if(!node || key == node->getKey())
         return node;
     if(cmp(key, node->getKey()))
@@ -212,6 +212,27 @@ void RBTree<T,CMP>::delete_fixup(std::unique_ptr<Node<T>>&& node){
 
 // USEFUL FUNCTIONS:
 template <typename T>
+std::ostream& operator<<(std::ostream& os, Node<T>* node) {
+    if (node) {
+        os << node->left.get();
+        os << node->key;
+        if (node->color == Color::black) {
+            os << "● ";
+        } else {
+            os << "○ ";
+        }
+        os << node->right.get();
+    }
+    return os;
+}
+
+template <typename T, typename CMP>
+std::ostream& operator<<(std::ostream& os, const RBTree<T,CMP>& tree) {
+    os << tree.root.get();
+    return os;
+}
+
+template <typename T>
 void inorder_walk_aux(const std::unique_ptr< Node<T> > node) {
     if (node == nullptr) return;
     inorder_walk_aux(node->getLeft());
@@ -219,8 +240,8 @@ void inorder_walk_aux(const std::unique_ptr< Node<T> > node) {
     inorder_walk_aux(node->getRight());
 }
 
-template <typename T>
-void inorder_walk(const RBTree<T> tree) {
+template <typename T, typename CMP>
+void inorder_walk(const RBTree<T,CMP> tree) {
     inorder_walk_aux(tree.root->getLeft());
     std::cout << tree.root->getKey() << " ";
     inorder_walk_aux(tree.root->getRight());

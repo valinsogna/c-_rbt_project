@@ -1,28 +1,24 @@
-SRC = RedBlackTree.cpp            \
-      RedBlackTree_iterator.cpp  
-
+# Description: Makefile for RedBlackTree
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++14
 
-OBJ = $(SRC:.cpp=.o)
+EXE = main.x
 
-# eliminate default suffixes
-.SUFFIXES:
-SUFFIXES =
-
-# just consider our own suffixes
-.SUFFIXES: .cpp .o
-
-all: $(OBJ)
+all: $(EXE)
 
 .PHONY: all
 
-%.o: %.cpp 
-	$(CXX) $< -c $(CXXFLAGS)
+main.x: main.o RedBlackTree.o
+	g++ main.o RedBlackTree.o -o main.x
+
+main.o: main.cpp RedBlackTree.h
+	g++ -c main.cpp -o main.o $(CXXFLAGS)
+
+RedBlackTree.o : RedBlackTree.cpp RedBlackTree.h
+	g++ -c RedBlackTree.cpp -o RedBlackTree.o $(CXXFLAGS)
 
 clean:
-	rm -f $(OBJ) *~
+	rm -f $(EXE) *~
 
 .PHONY: clean
 
-01_auto.x : CXXFLAGS+=-Wno-unused-variable

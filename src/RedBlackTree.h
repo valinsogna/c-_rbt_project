@@ -74,8 +74,8 @@ class RBTree {
     std::unique_ptr< Node<T>> root;
     CMP cmp;
 
-    // useful private methods 
-    const Node<T>* search_subtree(Node<T>*, const T&) const;
+    // PRIVATE METHODS
+    Node<T>* search_subtree(Node<T>*, const T&) const;
     void insert(std::unique_ptr<Node<T>>);
     // Replace x by y in the tree. It returns the ptr to the removed x:
     Node<T>* transplant(Node<T>* x, std::unique_ptr<Node<T>>&& y);
@@ -114,9 +114,13 @@ class RBTree {
     }
 };
 
+template <typename T, typename CMP>
+void inorder_walk_aux(const std::unique_ptr< typename RBTree<T,CMP>::Node >);
+template <typename T, typename CMP>
+void inorder_walk(const RBTree<T,CMP>);
 template <typename T>
-void inorder_walk_aux(const std::unique_ptr< typename RBTree<T>::Node >);
-template <typename T>
-void inorder_walk(const RBTree<T>);
+std::ostream& operator<<(std::ostream&, Node<T>*);
+template <typename T, typename CMP>
+std::ostream& operator<<(std::ostream&, const RBTree<T,CMP>&);
 
 #endif //__RedBlackTree_H__
