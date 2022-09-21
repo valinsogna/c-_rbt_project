@@ -9,7 +9,7 @@ all: $(EXE)
 .PHONY: all
 
 RBTree.x: 
-	$(CXX) RBTree.cpp -o main.x $(CXXFLAGS)
+	$(CXX) RBTree.cpp -o RBTree.x $(CXXFLAGS)
 
 clean:
 	rm -f $(EXE) *~
