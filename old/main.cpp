@@ -5,7 +5,7 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
-#include "RedBlackTree.h"
+#include "RedBlackTree.hpp"
 
 // RBTree TESTS:
 std::mt19937 gen(std::random_device{}());

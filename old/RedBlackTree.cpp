@@ -1,7 +1,7 @@
 // Red Black Tree implementation in C++
 // Author: Valeria Insogna
 
-#include "RedBlackTree.h"
+#include "RedBlackTree.hpp"
 
 // RBTree PUBLIC METHODS
 template <typename T, typename CMP>

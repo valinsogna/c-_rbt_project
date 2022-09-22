@@ -1,5 +1,5 @@
-#ifndef __RedBlackTree_H__
-#define __RedBlackTree_H__
+#ifndef __RedBlackTree_HPP__
+#define __RedBlackTree_HPP__
 
 #include <memory> // for std::unique_ptr
 #include <functional> // for std::less
@@ -123,4 +123,4 @@ std::ostream& operator<<(std::ostream&, Node<T>*);
 template <typename T, typename CMP>
 std::ostream& operator<<(std::ostream&, const RBTree<T,CMP>&);
 
-#endif //__RedBlackTree_H__
+#endif //__RedBlackTree_HPP__
