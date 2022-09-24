@@ -91,7 +91,7 @@ class RBTree {
 
     public:
     // ctor
-    RBTree() noexcept : cmp{std::less<T>()}{}
+    RBTree() noexcept {}
     // default dtor
     ~RBTree() noexcept = default;
 

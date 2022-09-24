@@ -141,7 +141,7 @@ int main() {
     //Rearranges the elements in the range [first,last) randomly, using g as uniform random number generator:
     std::shuffle(v.begin(), v.end(), gen);
 
-    RBTree<int,std::less<int>> rbtree;
+    RBTree<int> rbtree;
     auto t1 = std::chrono::steady_clock::now();
     for (auto n : v) {
         rbtree.insert(n);

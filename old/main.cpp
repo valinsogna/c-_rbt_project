@@ -34,31 +34,32 @@ int main() {
         std::cout << rbtree << std::endl;
     }
 
-    std::cout << "\nTry find : 7\n";
-    auto it = std::find(rbtree.begin(), rbtree.end(), 7);
-    if (it != rbtree.end())
-      std::cout << "    Found " << *it << std::endl;
-    else
-      std::cout << "    Not found\n";
+    // std::cout << "\nTry find : 7\n";
+    // auto it = std::find(rbtree.begin(), rbtree.end(), 7);
+    // if (it != rbtree.end())
+    //   std::cout << "    Found " << *it << std::endl;
+    // else
+    //   std::cout << "    Not found\n";
 
-    std::cout << "\nTry find : 70\n";
-    it = std::find(rbtree.begin(), rbtree.end(), 70);
-    if (it != rbtree.end())
-      std::cout << "    Found " << *it << std::endl;
-    else
-      std::cout << "    Not found\n";
+    // std::cout << "\nTry find : 70\n";
+    // it = std::find(rbtree.begin(), rbtree.end(), 70);
+    // if (it != rbtree.end())
+    //   std::cout << "    Found " << *it << std::endl;
+    // else
+    //   std::cout << "    Not found\n";
 
-    std::shuffle(v.begin(), v.end(), gen);
+    // std::shuffle(v.begin(), v.end(), gen);
 
-    t1 = std::chrono::steady_clock::now();
-    for (auto n : v) {
-        rbtree.Delete(n);
-    }
-    t2 = std::chrono::steady_clock::now();
-    auto dt3 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+    // t1 = std::chrono::steady_clock::now();
+    // for (auto n : v) {
+    //     rbtree.Delete(n);
+    // }
+    // t2 = std::chrono::steady_clock::now();
+    // auto dt3 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 
 
-    std::cout << "\nDeleting " << SIZE << " elements:\n";
-    std::cout << "unique ptr red-black tree : " << dt3.count() << " ms\n";
+    // std::cout << "\nDeleting " << SIZE << " elements:\n";
+    // std::cout << "unique ptr red-black tree : " << dt3.count() << " ms\n";
+    std::cout << "\nDeleting " << rbtree.cmp(4,4)<< std::endl;
     return 0;
 }
